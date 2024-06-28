@@ -13,12 +13,20 @@ class KitaVideoPlayer extends StatefulWidget {
   final Widget? placeholder;
   final bool virtualDisplay;
 
+  /// The callback invoked when the [Video] enters fullscreen.
+  final Future<void> Function(bool isFullscreen)? onEnterFullscreen;
+
+  /// The callback invoked when the [Video] exits fullscreen.
+  final Future<void> Function(bool isFlullscreen)? onExitFullscreen;
+
   const KitaVideoPlayer({
     super.key,
     required this.controller,
     required this.aspectRatio,
     this.placeholder,
     this.virtualDisplay = true,
+    this.onEnterFullscreen,
+    this.onExitFullscreen,
   });
 
   @override
@@ -43,7 +51,6 @@ class KitaVideoPlayerState extends State<KitaVideoPlayer>
     return VideoStateInheritedWidget(
       state: this as dynamic,
       child: Stack(
-        fit: StackFit.passthrough,
         children: [
           VlcPlayer(
             controller: widget.controller,
@@ -69,6 +76,7 @@ class KitaVideoPlayerState extends State<KitaVideoPlayer>
         setState(() {
           isFullscreen = true;
         });
+        widget.onEnterFullscreen!(true);
         await Future.wait(
           [
             SystemChrome.setEnabledSystemUIMode(
@@ -102,6 +110,8 @@ class KitaVideoPlayerState extends State<KitaVideoPlayer>
         setState(() {
           isFullscreen = false;
         });
+
+        widget.onEnterFullscreen!(false);
         await Future.wait(
           [
             SystemChrome.setEnabledSystemUIMode(

@@ -14,10 +14,10 @@ class KitaVideoPlayer extends StatefulWidget {
   final bool virtualDisplay;
 
   /// The callback invoked when the [Video] enters fullscreen.
-  final Future<void> Function(bool isFullscreen)? onEnterFullscreen;
+  final Function(bool isFullscreen)? onEnterFullscreen;
 
   /// The callback invoked when the [Video] exits fullscreen.
-  final Future<void> Function(bool isFlullscreen)? onExitFullscreen;
+  final Function(bool isFlullscreen)? onExitFullscreen;
 
   const KitaVideoPlayer({
     super.key,

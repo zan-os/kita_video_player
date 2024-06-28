@@ -51,6 +51,7 @@ class KitaVideoPlayerState extends State<KitaVideoPlayer>
     return VideoStateInheritedWidget(
       state: this as dynamic,
       child: Stack(
+        fit: StackFit.passthrough,
         children: [
           VlcPlayer(
             controller: widget.controller,

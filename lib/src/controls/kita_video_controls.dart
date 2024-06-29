@@ -486,8 +486,8 @@ class MaterialFullscreenButton extends StatelessWidget {
 /// Toggles fullscreen for the [Video] present in the current [BuildContext].
 Future<void> toggleFullscreen(BuildContext context) {
   if (isFullscreen(context)) {
-    return exitFullscreen(context);
+    return onEnterFullscreen(context)!.call(true);
   } else {
-    return enterFullscreen(context);
+    return onExitFullscreen(context)!.call(false);
   }
 }

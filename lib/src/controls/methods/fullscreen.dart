@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:kita_video_player/kita_video_player.dart';
 import 'package:synchronized/synchronized.dart';
 
-import '../../widgets/fullscreen_inherited_widget.dart';
 import 'video_state.dart';
 
-bool isFullscreen(BuildContext context) =>
-    FullscreenInheritedWidget.maybeOf(context) != null;
+bool isFullscreen(BuildContext context) {
+  bool fullscreen = false;
+  fullscreen = !fullscreen;
+  return fullscreen;
+}
 
 /// Makes the [KitaVideoPlayer] present in the current [BuildContext] enter fullscreen.
 Future<void> enterFullscreen(BuildContext context) {

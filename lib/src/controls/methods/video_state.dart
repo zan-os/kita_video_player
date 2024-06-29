@@ -11,3 +11,13 @@ VlcPlayerController controller(BuildContext context) =>
 /// Returns the [KitaVideoPlayerState] associated with the [KitaVideoPlayer] present in the current [BuildContext].
 KitaVideoPlayerState state(BuildContext context) =>
     VideoStateInheritedWidget.of(context).state;
+
+/// Returns the callback which must be invoked when the video enters fullscreen mode.
+Future<void> Function(bool isFullscreen)? onEnterFullscreen(
+        BuildContext context) =>
+    VideoStateInheritedWidget.of(context).state.widget.onEnterFullscreen;
+
+/// Returns the callback which must be invoked when the video exits fullscreen mode.
+Future<void> Function(bool isFullscreen)? onExitFullscreen(
+        BuildContext context) =>
+    VideoStateInheritedWidget.of(context).state.widget.onExitFullscreen;

@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
+import 'methods/fullscreen.dart';
 import 'methods/video_state.dart';
 
 /// [MaterialVideoControlsThemeData] available in this [context].
@@ -392,8 +392,6 @@ class _PlayOrPauseButtonState extends State<_PlayOrPauseButton>
     duration: const Duration(milliseconds: 200),
   );
 
-  StreamSubscription<bool>? subscription;
-
   @override
   void setState(VoidCallback fn) {
     if (mounted) {
@@ -404,28 +402,37 @@ class _PlayOrPauseButtonState extends State<_PlayOrPauseButton>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    controller(context).addListener(
+      _playOrPauseAnimation,
+    );
   }
 
   @override
   void dispose() {
     animation.dispose();
-    subscription?.cancel();
+    // controller(context).removeListener(_playOrPauseAnimation);
     super.dispose();
+  }
+
+  void _playOrPauseAnimation() {
+    if (controller(context).value.isPlaying) {
+      animation.forward();
+    } else {
+      animation.reverse();
+    }
+  }
+
+  void playOrPause() {
+    if (controller(context).value.isPlaying) {
+      controller(context).pause();
+      return;
+    }
+    controller(context).play();
+    return;
   }
 
   @override
   Widget build(BuildContext context) {
-    void playOrPause() {
-      log('${controller(context).value.isPlaying}');
-      if (controller(context).value.isPlaying) {
-        log('called true');
-        controller(context).pause();
-        return;
-      }
-      controller(context).play();
-      return;
-    }
-
     return IconButton(
       onPressed: () => playOrPause(),
       iconSize: widget.iconSize ?? _theme(context).buttonBarButtonSize,
@@ -467,7 +474,7 @@ class MaterialFullscreenButton extends StatelessWidget {
     return IconButton(
       onPressed: () => toggleFullscreen(context),
       icon: icon ??
-          (state(context).isFullscreen
+          (isFullscreen(context)
               ? const Icon(Icons.fullscreen_exit)
               : const Icon(Icons.fullscreen)),
       iconSize: iconSize ?? _theme(context).buttonBarButtonSize,
@@ -478,9 +485,9 @@ class MaterialFullscreenButton extends StatelessWidget {
 
 /// Toggles fullscreen for the [Video] present in the current [BuildContext].
 Future<void> toggleFullscreen(BuildContext context) {
-  if (state(context).isFullscreen) {
-    return state(context).defaultExitNativeFullscreen();
+  if (isFullscreen(context)) {
+    return exitFullscreen(context);
   } else {
-    return state(context).defaultEnterNativeFullscreen();
+    return enterFullscreen(context);
   }
 }

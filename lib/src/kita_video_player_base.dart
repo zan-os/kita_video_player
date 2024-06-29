@@ -14,10 +14,10 @@ class KitaVideoPlayer extends StatefulWidget {
   final bool virtualDisplay;
 
   /// The callback invoked when the [Video] enters fullscreen.
-  final Function(bool isFullscreen)? onEnterFullscreen;
+  final Future<void> Function(bool isFullscreen)? onEnterFullscreen;
 
   /// The callback invoked when the [Video] exits fullscreen.
-  final Function(bool isFlullscreen)? onExitFullscreen;
+  final Future<void> Function(bool isFullscreen)? onExitFullscreen;
 
   const KitaVideoPlayer({
     super.key,
@@ -25,8 +25,8 @@ class KitaVideoPlayer extends StatefulWidget {
     required this.aspectRatio,
     this.placeholder,
     this.virtualDisplay = true,
-    this.onEnterFullscreen,
-    this.onExitFullscreen,
+    this.onEnterFullscreen = defaultEnterNativeFullscreen,
+    this.onExitFullscreen = defaultExitNativeFullscreen,
   });
 
   @override
@@ -46,8 +46,6 @@ class KitaVideoPlayerState extends State<KitaVideoPlayer>
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final fullscrenAspectRatio = screenSize.width / screenSize.height;
     return VideoStateInheritedWidget(
       state: this as dynamic,
       child: Stack(
@@ -55,8 +53,7 @@ class KitaVideoPlayerState extends State<KitaVideoPlayer>
         children: [
           VlcPlayer(
             controller: widget.controller,
-            aspectRatio:
-                (isFullscreen) ? fullscrenAspectRatio : widget.aspectRatio,
+            aspectRatio: widget.aspectRatio,
             placeholder: widget.placeholder,
             virtualDisplay: widget.virtualDisplay,
           ),
@@ -67,73 +64,64 @@ class KitaVideoPlayerState extends State<KitaVideoPlayer>
       ),
     );
   }
-
-// --------------------------------------------------
-
-  /// Makes the native window enter fullscreen.
-  Future<void> defaultEnterNativeFullscreen() async {
-    try {
-      if (Platform.isAndroid || Platform.isIOS) {
-        setState(() {
-          isFullscreen = true;
-        });
-        widget.onEnterFullscreen!(true);
-        await Future.wait(
-          [
-            SystemChrome.setEnabledSystemUIMode(
-              SystemUiMode.immersiveSticky,
-              overlays: [],
-            ),
-            SystemChrome.setPreferredOrientations(
-              [
-                DeviceOrientation.landscapeLeft,
-                DeviceOrientation.landscapeRight,
-              ],
-            ),
-          ],
-        );
-      } else if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
-        await const MethodChannel('com.alexmercerind/media_kit_video')
-            .invokeMethod(
-          'Utils.EnterNativeFullscreen',
-        );
-      }
-    } catch (exception, stacktrace) {
-      debugPrint(exception.toString());
-      debugPrint(stacktrace.toString());
-    }
-  }
-
-  /// Makes the native window exit fullscreen.
-  Future<void> defaultExitNativeFullscreen() async {
-    try {
-      if (Platform.isAndroid || Platform.isIOS) {
-        setState(() {
-          isFullscreen = false;
-        });
-
-        widget.onEnterFullscreen!(false);
-        await Future.wait(
-          [
-            SystemChrome.setEnabledSystemUIMode(
-              SystemUiMode.manual,
-              overlays: SystemUiOverlay.values,
-            ),
-            SystemChrome.setPreferredOrientations(
-              [DeviceOrientation.portraitUp],
-            ),
-          ],
-        );
-      } else if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
-        await const MethodChannel('com.alexmercerind/media_kit_video')
-            .invokeMethod(
-          'Utils.ExitNativeFullscreen',
-        );
-      }
-    } catch (exception, stacktrace) {
-      debugPrint(exception.toString());
-      debugPrint(stacktrace.toString());
-    }
-  }
-// --------------------------------------------------
 }
+
+// --------------------------------------------------
+
+/// Makes the native window enter fullscreen.
+Future<void> defaultEnterNativeFullscreen(bool isFullscreen) async {
+  try {
+    if (Platform.isAndroid || Platform.isIOS) {
+      await Future.wait(
+        [
+          SystemChrome.setEnabledSystemUIMode(
+            SystemUiMode.immersiveSticky,
+            overlays: [],
+          ),
+          SystemChrome.setPreferredOrientations(
+            [
+              DeviceOrientation.landscapeLeft,
+              DeviceOrientation.landscapeRight,
+            ],
+          ),
+        ],
+      );
+    } else if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+      await const MethodChannel('com.alexmercerind/media_kit_video')
+          .invokeMethod(
+        'Utils.EnterNativeFullscreen',
+      );
+    }
+  } catch (exception, stacktrace) {
+    debugPrint(exception.toString());
+    debugPrint(stacktrace.toString());
+  }
+}
+
+/// Makes the native window exit fullscreen.
+Future<void> defaultExitNativeFullscreen(bool isFullscreen) async {
+  try {
+    if (Platform.isAndroid || Platform.isIOS) {
+      await Future.wait(
+        [
+          SystemChrome.setEnabledSystemUIMode(
+            SystemUiMode.manual,
+            overlays: SystemUiOverlay.values,
+          ),
+          SystemChrome.setPreferredOrientations(
+            [DeviceOrientation.portraitUp],
+          ),
+        ],
+      );
+    } else if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+      await const MethodChannel('com.alexmercerind/media_kit_video')
+          .invokeMethod(
+        'Utils.ExitNativeFullscreen',
+      );
+    }
+  } catch (exception, stacktrace) {
+    debugPrint(exception.toString());
+    debugPrint(stacktrace.toString());
+  }
+}
+// --------------------------------------------------

@@ -21,3 +21,5 @@ Future<void> Function(bool isFullscreen)? onEnterFullscreen(
 Future<void> Function(bool isFullscreen)? onExitFullscreen(
         BuildContext context) =>
     VideoStateInheritedWidget.of(context).state.widget.onExitFullscreen;
+
+bool isFullscreen(BuildContext context) => state(context).isFullscreen;

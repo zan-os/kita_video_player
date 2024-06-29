@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'methods/fullscreen.dart';
 import 'methods/video_state.dart';
 
 /// [MaterialVideoControlsThemeData] available in this [context].
@@ -486,8 +485,8 @@ class MaterialFullscreenButton extends StatelessWidget {
 /// Toggles fullscreen for the [Video] present in the current [BuildContext].
 Future<void> toggleFullscreen(BuildContext context) {
   if (isFullscreen(context)) {
-    return onEnterFullscreen(context)!.call(true);
+    return state(context).defaultExitNativeFullscreen(false);
   } else {
-    return onExitFullscreen(context)!.call(false);
+    return state(context).defaultExitNativeFullscreen(true);
   }
 }
